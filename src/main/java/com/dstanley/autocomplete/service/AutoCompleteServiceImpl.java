@@ -5,9 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -74,7 +72,7 @@ public class AutoCompleteServiceImpl implements AutoCompleteService {
 			node = node.getChildren().get(c);
 		}
 
-		buildSuggestionListBFS(node, suggestions);
+		buildSuggestionListDFS(node, suggestions);
 		autoCompleteCache.put(prefix, suggestions);
 		suggestions.sort(Comparator.comparing(String::length).thenComparing(String::compareToIgnoreCase));
 
@@ -83,26 +81,26 @@ public class AutoCompleteServiceImpl implements AutoCompleteService {
 
 	/*
 	 * There are 2 algorithms here DFS seems to be more performant on the ~69k
-	 * sized dictionary that is included as part of the project but the othere
+	 * sized dictionary that is included as part of the project but the BFS
 	 * is here just to demonstrate that on a large enough sample set we would probably
-	 * end up using a BFS or directed graph implementation over a recursive solution
+	 * end up choosing a BFS or directed graph implementation over a recursive solution
 	 */
-	public void buildSuggestionListDFS(TrieNode node, List<String> suggestions) {
+	private void buildSuggestionListDFS(TrieNode node, List<String> suggestions) {
 
-        if (node.isEndOfWord()) {
-            suggestions.add(node.getWord().toString());
-        }
- 
-        for (TrieNode child : node.getChildren().values()) {
-            buildSuggestionListDFS(child, suggestions);
-        }
+		if (node.isEndOfWord()) {
+			suggestions.add(node.getWord().toString());
+		}
+
+		for (TrieNode child : node.getChildren().values()) {
+			buildSuggestionListDFS(child, suggestions);
+		}
 	}
 
 	/*
 	 * Code for BFS is included as well just as an example of an alternative
 	 * implementation that was utilized for testing
-	 */
-	public void buildSuggestionListBFS(TrieNode node, List<String> suggestions) {
+	 *
+	private void buildSuggestionListBFS(TrieNode node, List<String> suggestions) {
 		Queue<TrieNode> queue = new LinkedList<>();
 		queue.add(node);
 		while (!queue.isEmpty()) {
@@ -114,5 +112,5 @@ public class AutoCompleteServiceImpl implements AutoCompleteService {
 				queue.add(tn);
 			}
 		}
-	}
+	}*/
 }
